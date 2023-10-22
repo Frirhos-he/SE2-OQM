@@ -8,6 +8,7 @@ const dayjs = require("dayjs"); //dayjs module
 
 const ticketDao = require("./dao-tickets"); // module for accessing the tickets table in the DB
 const userDao = require("./dao-users"); // module for accessing the user table in the DB
+const serviceDao = require("./dao-services"); // module for accessing the user table in the DB
 
 /*** init express and set up the middlewares ***/
 const app = express(); // application object app
@@ -152,7 +153,7 @@ app.get("/api/noEnqueued/:serviceId", async (req,res) => {
   try {
     const result = await ticketDao.getNumberOfEnqueuedTicketsPerService(req.params.serviceId);
     res.json(result);
-  } catch {
+  } catch (err) {
     res.status(500).json(err);
   }
 });
@@ -161,7 +162,16 @@ app.get("/api/noServed/:serviceId", async (req,res) => {
   try {
     const result = await ticketDao.getNumberOfServedTicketsPerService(req.params.serviceId);
     res.json(result);
-  } catch {
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+app.get("/api/services", async (req, res) => {
+  try {
+    const services = await serviceDao.getServices();
+    res.json(services);
+  } catch (err) {
     res.status(500).json(err);
   }
 });
