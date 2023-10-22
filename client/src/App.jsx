@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Outlet, Navigate, useNavigate } from 'rea
 import { useState, useEffect } from 'react';
 import  NotFoundPage  from './pages/NotFoundPage';
 import MainPage from './pages/MainPage';
+import Sample from './pages/Sample';
 import { LoginForm } from './components/AuthComponents';
 import BackOfficeLayout from './pages/BackOfficeLayout';
 import API from './API';
@@ -127,7 +128,7 @@ function App() {
                 loggedin ? (
                   <BackOfficeLayout user={userLogged} />
                 ) : (
-                  <MainPage />
+                  <Sample/>
                 )
               }
             />
