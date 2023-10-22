@@ -3,7 +3,7 @@
 const express = require("express"); // The core Express module that allows you to create a simple and extensible web server web framework
 const morgan = require("morgan"); //  A logging middleware that logs HTTP requests to the console.
 const cors = require("cors"); //  A middleware that enables Cross-Origin Resource Sharing, allowing requests from different origins.
-const { check, validationResult } = require("express-validator"); //  A validation middleware that provides functions for validating and sanitizing input data.
+const { check, validationResult, param } = require("express-validator"); //  A validation middleware that provides functions for validating and sanitizing input data.
 const dayjs = require("dayjs"); //dayjs module
 
 const ticketDao = require("./dao-tickets"); // module for accessing the tickets table in the DB
@@ -144,6 +144,27 @@ app.get(
     }
   }
 );
+
+/**
+ * @returns the number of enqueued tickets before the last one
+ */
+app.get("/api/noEnqueued/:serviceId", async (req,res) => {
+  try {
+    const result = await ticketDao.getNumberOfEnqueuedTicketsPerService(req.params.serviceId);
+    res.json(result);
+  } catch {
+    res.status(500).json(err);
+  }
+});
+
+app.get("/api/noServed/:serviceId", async (req,res) => {
+  try {
+    const result = await ticketDao.getNumberOfServedTicketsPerService(req.params.serviceId);
+    res.json(result);
+  } catch {
+    res.status(500).json(err);
+  }
+});
 
 /*
 // 2. Retrieve the list of all the available publicated ticketss.
