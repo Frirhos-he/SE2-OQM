@@ -8,19 +8,13 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-
 function MainPage(props) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
-  const handleClick = () => {
-    // Simulate an async operation, e.g., fetching data
-    setIsLoading(true);
 
-    // Simulate the completion of the async operation after a delay
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);};
+  const handleClick = () => {
+    navigate("/getTicket");
+  }
 
   return (
     <Container>
@@ -52,5 +46,4 @@ function MainPage(props) {
     </Container>
   );
 }
-
 export default MainPage;

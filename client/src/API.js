@@ -1,11 +1,7 @@
 "use strict";
-
 import dayjs from "dayjs";
-
 const SERVER_URL = "http://localhost:3001/api";
-
 // USER APIs
-
 const login = async (credentials) => {
   try {
     const response = await fetch(SERVER_URL + "/sessions", {
@@ -31,7 +27,6 @@ const login = async (credentials) => {
     }
   }
 };
-
 const getUserInfo = async () => {
   try {
     const response = await fetch(SERVER_URL + "/sessions/current", {
@@ -51,13 +46,11 @@ const getUserInfo = async () => {
     }
   }
 };
-
 const getUsers = async () => {
   try {
     const response = await fetch(SERVER_URL + "/users", {
       credentials: "include",
     });
-
     if (response.ok) {
       const users = await response.json();
       return users;
@@ -73,14 +66,12 @@ const getUsers = async () => {
     }
   }
 };
-
 const logout = async () => {
   try {
     const response = await fetch(SERVER_URL + "/sessions/current", {
       method: "DELETE",
       credentials: "include",
     });
-
     if (response.ok) {
       return null;
     } else {
@@ -97,13 +88,42 @@ const logout = async () => {
 };
 
 // Tickets APIs
+async function getAllServices() {
+  // call  /api/services
+  const response = await fetch(SERVER_URL + "/services");
+  const questions = await response.json();
+
+  if (response.ok) {
+    return questions.map((e) => ({
+      id: e.id,
+      serviceName: e.serviceName,
+      id_counter: e.id_counter,
+    }));
+  } else {
+    throw questions;
+  }
+}
+
+async function getAllCounters() {
+  // call  /api/counters
+  const response = await fetch(SERVER_URL + "/counters");
+  const questions = await response.json();
+
+  if (response.ok) {
+    return questions.map((e) => ({
+      id: e.id_counter,
+      value_number: e.value_number,
+    }));
+  } else {
+    throw questions;
+  }
+}
 
 const getTickets = async () => {
   try {
     const response = await fetch(SERVER_URL + "/tickets", {
       credentials: "include",
     });
-
     if (response.ok) {
       const ticketsJson = await response.json();
       return ticketsJson;
@@ -116,7 +136,6 @@ const getTickets = async () => {
           creationDate: p.creationDate,
           publicationDate: p.publicationDate,
         };*/
-
       //return clientPage;
       //});
     } else {
@@ -135,7 +154,6 @@ const getTickets = async () => {
 const getPublicatedtickets = async () => {
   try {
     const response = await fetch(SERVER_URL + "/tickets/publicated");
-
     if (response.ok) {
       const ticketsJson = await response.json();
       return ticketsJson.map((p) => {
@@ -161,7 +179,6 @@ const getPublicatedtickets = async () => {
     }
   }
 };
-
 const getPageById = async (id) => {
   try {
     if (id === null) {
@@ -173,17 +190,14 @@ const getPageById = async (id) => {
     const response = await fetch(SERVER_URL + `/tickets/${id}`, {
       credentials: "include",
     });
-
     if (response.ok) {
       const page = await response.json();
       // Order the contents array based on the position property
       const orderedContentsByPosition = page.contents.sort(
         (a, b) => a.position - b.position
       );
-
       // Update the contents property with the ordered array
       page.contents = orderedContentsByPosition;
-
       return page;
     } else {
       const errMessage = await response.json();
@@ -197,7 +211,6 @@ const getPageById = async (id) => {
     }
   }
 };
-
 const updatePage = async (pageid, page) => {
   try {
     if (pageid === null) {
@@ -215,22 +228,18 @@ const updatePage = async (pageid, page) => {
     ) {
       throw { error: "page has not all the properties" };
     }
-
     if (!Number.isInteger(Number(pageid)) || Number(pageid) < 1) {
       throw { error: "id must be well formatted" };
     }
     if (page.title.length < 2 || page.title.length > 160) {
       throw { error: "Title length must be between 2 and 160 characters" };
     }
-
     if (!Number.isInteger(Number(page.authorid)) || Number(page.authorid) < 0) {
       throw { error: "Author ID must be a non-negative integer" };
     }
-
     if (!dayjs(page.creationDate).isValid()) {
       throw { error: "Invalid creation date format" };
     }
-
     if (
       page.publicationDate !== "" &&
       (!page.publicationDate.isValid() ||
@@ -238,7 +247,6 @@ const updatePage = async (pageid, page) => {
     ) {
       throw { error: "Invalid publication date format" };
     }
-
     const creationDate = dayjs(page.creationDate);
     if (
       page.publicationDate !== "" &&
@@ -246,11 +254,9 @@ const updatePage = async (pageid, page) => {
     ) {
       throw { error: "creation date cannot be after the publication date" };
     }
-
     if (!Array.isArray(page.contents) || page.contents.length < 2) {
       throw { error: "Contents must be an array with a minimum length of 2" };
     }
-
     const response = await fetch(SERVER_URL + "/tickets/" + pageid, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -266,7 +272,6 @@ const updatePage = async (pageid, page) => {
         contents: page.contents,
       }),
     });
-
     if (!response.ok) {
       const errMessage = await response.json();
       throw errMessage;
@@ -281,7 +286,6 @@ const updatePage = async (pageid, page) => {
     }
   }
 };
-
 const addPage = async (page) => {
   try {
     if (!page || typeof page !== "object") {
@@ -296,19 +300,15 @@ const addPage = async (page) => {
     ) {
       throw { error: "page has not all the properties" };
     }
-
     if (page.title.length < 2 || page.title.length > 160) {
       throw { error: "Title length must be between 2 and 160 characters" };
     }
-
     if (parseInt(page.authorid) < 0) {
       throw { error: "Author ID must be a non-negative integer" };
     }
-
     if (!page.creationDate.isValid()) {
       throw { error: "Invalid creation date format" };
     }
-
     if (
       page.publicationDate !== "" &&
       (!page.publicationDate.isValid() ||
@@ -316,18 +316,15 @@ const addPage = async (page) => {
     ) {
       throw { error: "Invalid publication date format" };
     }
-
     if (
       page.publicationDate !== "" &&
       page.creationDate.isAfter(page.publicationDate)
     ) {
       throw { error: "creation date cannot be after the publication date" };
     }
-
     if (!Array.isArray(page.contents) || page.contents.length < 2) {
       throw { error: "Contents must be an array with a minimum length of 2" };
     }
-
     const response = await fetch(SERVER_URL + "/tickets/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -359,7 +356,6 @@ const addPage = async (page) => {
     }
   }
 };
-
 const deletePage = async (pageid) => {
   try {
     if (pageid === null || typeof pageid !== "number" || pageid < 1) {
@@ -384,11 +380,9 @@ const deletePage = async (pageid) => {
     }
   }
 };
-
 const getImages = async () => {
   try {
     const response = await fetch(SERVER_URL + "/images");
-
     if (response.ok) {
       const imagesJson = await response.json();
       return imagesJson;
@@ -404,13 +398,10 @@ const getImages = async () => {
     }
   }
 };
-
 // TITLE APIs
-
 const getTitle = async () => {
   try {
     const response = await fetch(SERVER_URL + "/titles");
-
     if (response.ok) {
       const titleJSON = await response.json();
       return titleJSON.title;
@@ -426,7 +417,6 @@ const getTitle = async () => {
     }
   }
 };
-
 const updateTitle = async (title) => {
   try {
     if (
@@ -436,7 +426,6 @@ const updateTitle = async (title) => {
       title.length > 160
     )
       throw { error: "title is not well formatted" };
-
     const response = await fetch(SERVER_URL + "/titles", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -445,7 +434,6 @@ const updateTitle = async (title) => {
         title: title,
       }),
     });
-
     if (!response.ok) {
       const errMessage = await response.json();
       throw errMessage;
@@ -468,6 +456,8 @@ const API = {
   getUserInfo,
   getUsers,
   getTickets,
+  getAllServices,
+  getAllCounters,
 };
 
 export default API;

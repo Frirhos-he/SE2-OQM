@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Outlet, Navigate, useNavigate } from 'rea
 import { useState, useEffect } from 'react';
 import  NotFoundPage  from './pages/NotFoundPage';
 import MainPage from './pages/MainPage';
-import Sample from './pages/Sample';
 import { LoginForm } from './components/AuthComponents';
 import BackOfficeLayout from './pages/BackOfficeLayout';
 import GetTicketComponent from './components/GetTicketComponent';
@@ -14,11 +13,15 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-
 function App() {
   const [userLogged, setUserLogged] = useState({});            //used to store infos of the logged user
   const [loggedin, setLoggedin] = useState(false); 
   const [message, setMessage] = useState('');
+
+  ///////////////////////
+  const [listServices, setListServices] = useState({});
+  const [listCounters, setListCounters] = useState({});
+
 
     // If an error occurs, the error message will be shown
   const handleErrors = (err) => {
@@ -48,7 +51,6 @@ function App() {
         throw err;
       }
     };
-
     const handleLogout = async () => {
       try{ 
       await API.logout();
@@ -84,6 +86,22 @@ function App() {
       },[]);
 
 
+  /////////////////////////////////////////////
+
+  useEffect(()=>{
+
+    //GET ALL SERVICES
+     API.getAllServices()
+    .then((q)=>setListServices(q))
+    .catch((err) => handleErrors(err));
+
+     //GET ALL COUNTERS
+     API.getAllCounters()
+    .then((q)=>setListCounters(q))
+    .catch((err) => handleErrors(err));
+
+  },[]);
+
 
   return (
     <Container
@@ -101,7 +119,6 @@ function App() {
               <>
                <Container fluid maxWidth="xl" >
                 <AppNavBar handleLogout={handleLogout} loggedin={loggedin} />
-
                   {message && (
                     <Box>
                       <Alert variant={message.type} onClose={() => setMessage('')} dismissible>
@@ -129,12 +146,13 @@ function App() {
                 loggedin ? (
                   <BackOfficeLayout user={userLogged} />
                 ) : (
-                  <Sample/>
+                  <MainPage />
                 )
               }
             />
 
-            <Route path="/getTicket" element={<GetTicketComponent/>} />
+            <Route path="/getTicket" 
+                element={<GetTicketComponent listServices={listServices} listCounters={listCounters} />} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Route>
@@ -144,5 +162,4 @@ function App() {
     </Container>
   );
 }
-
 export default App;
