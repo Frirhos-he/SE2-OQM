@@ -62,6 +62,36 @@ exports.getNumberOfServedTicketsPerService = (serviceId) => {
     });
   });
 };
+/**
+ * @returns the ticket belonging to specified service
+ */
+
+exports.getticketByService = (serviceId) => {
+  return new Promise((resolve, reject) => {
+    const sql = `
+    SELECT id, creationdate
+    FROM tickets
+    WHERE closeddate IS NULL
+      AND workerid= 0
+      AND serviceid = ?
+    ORDER BY creationdate
+    LIMIT 1;
+    `;
+    db.get(sql, [serviceId], (err, ticket) => {
+      if (err) {
+        reject(err);
+      } else if (ticket === undefined) {
+        resolve({ error: "ticket not available" });
+      } else {
+        const ticketObject = {
+          id: ticket.id,
+          creationDate: ticket.creationdate,
+        };
+        resolve(ticketObject); // Resolve the Promise with the ticketObject
+      }
+    });
+  });
+};
 
 /*
 // This function retrieves the whole list of tickets from the database.

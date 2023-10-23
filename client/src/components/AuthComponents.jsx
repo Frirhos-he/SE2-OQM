@@ -18,7 +18,7 @@ function LoginForm(props) {
     props
       .login(credentials)
       .then(() => {
-        navigate('/tickets');
+        navigate('/');
       })
       .catch((err) => handleErrors(err));
   };

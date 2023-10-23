@@ -5,13 +5,9 @@ import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 
-const options = [
-  'Boxes',
-  'Letters',
-  'Others',
-];
 
-export default function ServiceMenu() {
+export default function ServiceMenu(props) {
+  const {disable, services} = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
   const open = Boolean(anchorEl);
@@ -32,7 +28,7 @@ export default function ServiceMenu() {
     <div>
       <List
         component="nav"
-        aria-label="Device settings"
+        aria-label="Service"
         sx={{ bgcolor: 'background.paper' }}
       >
         <ListItem
@@ -45,21 +41,21 @@ export default function ServiceMenu() {
           onClick={handleClickListItem}
         >
           <ListItemText
-            primary={options[selectedIndex]}
+            primary={services[selectedIndex]}
           />
         </ListItem>
       </List>
       <Menu
         id="lock-menu"
         anchorEl={anchorEl}
-        open={open}
+        open={!disable ? open : false}
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'lock-button',
           role: 'listbox',
         }}
       >
-        {options.map((option, index) => (
+        {services.map((option, index) => (
           <MenuItem
             key={option}
             selected={index === selectedIndex}

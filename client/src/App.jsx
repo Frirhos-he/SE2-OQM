@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
+import Sample from './pages/Sample';
 function App() {
   const [userLogged, setUserLogged] = useState({});            //used to store infos of the logged user
   const [loggedin, setLoggedin] = useState(false); 
@@ -144,7 +145,7 @@ function App() {
               path="/"
               element={
                 loggedin ? (
-                  <BackOfficeLayout user={userLogged} />
+                  <Sample user={userLogged} />
                 ) : (
                   <MainPage />
                 )

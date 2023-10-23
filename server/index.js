@@ -173,6 +173,47 @@ app.get("/api/counters", async (req, res) => {
   }
 });
 
+// 3. Retrieve an open ticket, given its serviceId
+// GET /api/tickets/<serviceId>
+// Given a service id, this route returns the oldest associated open ticket
+// it also check credentials
+
+app.get(
+  "/api/tickets/:serviceid",
+  [check("id").isInt({ min: 1 })],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(422).json({
+          error: errors
+            .array()
+            .map((error) => error.msg)
+            .join(" "),
+        });
+      }
+      const result = await ticketDao.getticketByService(req.params.id);
+      if (result.error) {
+        res.status(404).json(result);
+      } else {
+        const today = dayjs();
+        const creationDate = dayjs(result.creationdate);
+        if (
+          req?.user ||
+          (creationDate.isValid() && today.isAfter(creationDate))
+        )
+          res.json(result);
+        else
+          return res.status(401).json({
+            error: "Cannot retrieve that ticket because date is after today!",
+          });
+      }
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+);
+
 /*
 // 2. Retrieve the list of all the available publicated ticketss.
 // GET /api/ticketss/publicated

@@ -9,22 +9,85 @@ import {
 import CircularProgress from '@mui/material/CircularProgress';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState , useEffect,useContext} from "react";
 import ServiceMenu from '../components/ServiceMenuComponents';
 import CurrentTimeDisplay from '../components/CurrentTimeDisplay';
 import CounterMenu from '../components/CounterMenuComponents';
-
+import dayjs from 'dayjs'; // Import dayjs
+import ErrorContext from '../errorContext';
 
 function Sample(props) {
+  const {user} = props;
   const navigate = useNavigate();
+   const {handleErrors} = useContext(ErrorContext);
   const [isLoading, setIsLoading] = useState(false);
   const [startButtonDisabled, setStartButtonDisabled] = useState(false);
+  const [startDate, setStartDate] = useState(null); // State to store the start date
+  const [closedDate, setClosedDate] = useState(null);     // State to store the closed date
+  const [service,setService] = useState('');
+  const [counter,setCounter] = useState();
+  const [ticket,setTicket] = useState(null);
+  const [counters,setCounters] = useState([]);
+  const [services,setServices] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const servicesTemp = await getAllServices();
   
+      setServices(servicesTemp);
+      
+      //to modify only the one available
+      const countersTemp = await getAllCounters();
+      setCounters(countersTemp);
+
+      getTicketbyService(services[0]);
+    } catch (error) {
+      setTicket(null);
+      setService();
+      setCounter();
+      setServices([]);
+      setCounters([]);
+      handleErrors(error);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+  const getTicketbyService = async () => {
+    try {
+      if(user && counter && service && !isLoading){
+          const ticketTemp = await API.getTicketbyService(service.id);
+          setTicket(ticketTemp);
+      }
+    }catch (error) {
+      setTicket(null);
+      setService();
+      setCounter();
+    }
+  }
   const handleStartClick = () => {
     setStartButtonDisabled(true);
+    setStartDate(dayjs()); // Save the start date
   };
   const handleNextClick = () => {
+    setClosedDate(dayjs());
+    //must send both start,closed date, service and counter
+
+    //must get next ticket if any available
+    //refresh
+    setStartDate();
+    setClosedDate();
+    setStartButtonDisabled(false);
   };
+    useEffect(() => {
+        fetchData(); 
+    },[user])
+
+    useEffect(() =>{
+      getTicketbyService();
+    },[user, service,counter])
+
 
 
   return (
@@ -38,15 +101,15 @@ function Sample(props) {
             <Typography variant="h6">Counter #</Typography>
           </Grid>
           <Grid item>
-            <CounterMenu />
+            <CounterMenu disable={startButtonDisabled} counters={counters}/>
           </Grid>
             <Grid item>
-                <ServiceMenu />
+                <ServiceMenu disable={startButtonDisabled} services={services} />
             </Grid>
         </Grid>
 
         <Grid item>
-          <Typography variant="body1">Currently serving ticket #5</Typography>
+          <Typography variant="body1">Currently serving ticket #{ticket?.id}</Typography>
         </Grid>
         <Grid item>
           <CurrentTimeDisplay />

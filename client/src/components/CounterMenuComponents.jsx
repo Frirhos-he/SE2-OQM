@@ -5,16 +5,14 @@ import ListItemText from '@mui/material/ListItemText';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 
-const options = [
-  '1',
-  '2',
-  '3',
-];
 
-export default function CounterMenu() {
+
+export default function CounterMenu(props) {
+  const {disable,counters} = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(1);
   const open = Boolean(anchorEl);
+  
   const handleClickListItem = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -45,21 +43,21 @@ export default function CounterMenu() {
           onClick={handleClickListItem}
         >
           <ListItemText
-            primary={options[selectedIndex]}
+            primary={counters[selectedIndex]}
           />
         </ListItem>
       </List>
       <Menu
         id="lock-menu"
         anchorEl={anchorEl}
-        open={open}
+        open={!disable ? open : false}
         onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'lock-button',
           role: 'listbox',
         }}
       >
-        {options.map((option, index) => (
+        {counters.map((option, index) => (
           <MenuItem
             key={option}
             selected={index === selectedIndex}

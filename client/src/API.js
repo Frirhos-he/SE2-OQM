@@ -91,31 +91,30 @@ const logout = async () => {
 async function getAllServices() {
   // call  /api/services
   const response = await fetch(SERVER_URL + "/services");
-  const questions = await response.json();
+  const services = await response.json();
 
   if (response.ok) {
-    return questions.map((e) => ({
+    return services.map((e) => ({
       id: e.id,
       serviceName: e.serviceName,
-      id_counter: e.id_counter,
     }));
   } else {
-    throw questions;
+    throw services;
   }
 }
 
 async function getAllCounters() {
   // call  /api/counters
   const response = await fetch(SERVER_URL + "/counters");
-  const questions = await response.json();
+  const counters = await response.json();
 
   if (response.ok) {
-    return questions.map((e) => ({
+    return counters.map((e) => ({
       id: e.id_counter,
       value_number: e.value_number,
     }));
   } else {
-    throw questions;
+    throw counters;
   }
 }
 
@@ -150,6 +149,34 @@ const getTickets = async () => {
     }
   }
 };
+
+const getTicketByServiceId = async (serviceId) => {
+  try {
+    if (serviceId === null) {
+      throw { error: "id is not a number" };
+    }
+    if (!Number.isInteger(Number(serviceId)) || Number(serviceId) < 1) {
+      throw { error: "id must be well formatted" };
+    }
+    const response = await fetch(SERVER_URL + `/tickets/${serviceId}`, {
+      credentials: "include",
+    });
+    if (response.ok) {
+      const page = await response.json();
+      return page;
+    } else {
+      const errMessage = await response.json();
+      throw errMessage;
+    }
+  } catch (error) {
+    if (error.hasOwnProperty("error")) {
+      throw error;
+    } else {
+      throw { error: "Cannot parse server response" };
+    }
+  }
+};
+
 /*
 const getPublicatedtickets = async () => {
   try {
@@ -458,6 +485,7 @@ const API = {
   getTickets,
   getAllServices,
   getAllCounters,
+  getTicketByServiceId,
 };
 
 export default API;
